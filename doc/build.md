@@ -11,5 +11,5 @@ Creating a bootimage:
 for compilation use `cargo bootimage`
 
 Run:
-`qemu-system-x86_64 -drive format=raw,file=target/target/debug/bootimage-swan_kernel.bin`
+`cargo run`
 or use grub/limine to compile kernel to iso file
