@@ -3,24 +3,26 @@
 
 use core::panic::PanicInfo;
 
-/// This function is called on panic.
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-static HELLO: &[u8] = b"Hello World!";
+const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
+
+fn print(s: &str){
+    s.as_bytes()
+        .iter()
+        .flat_map(|bt| [*bt, 0x7 as u8])
+        .enumerate()
+        .for_each(|(i, byte)| unsafe {
+            *VGA_BUFFER.offset(i as isize) = byte;
+        });
+}
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    let vga_buffer = 0xb8000 as *mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }
+    print("Hello world!");
 
     loop {}
 }
