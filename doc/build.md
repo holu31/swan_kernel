@@ -6,19 +6,6 @@ For build & run need:
 Installing rust-nightly
 `rustup override set nightly`
 
-Creating a cargo config:
-`path - PROJECT_PATH/.cargo/config.toml`
-config.toml:
-```json
-[unstable]
-build-std-features = ["compiler-builtins-mem"]
-build-std = ["core", "compiler_builtins"]
-
-[build]
-target = "target.json"
-
-```
-
 Creating a bootimage:
 `cargo install bootimage`
 for compilation use `cargo bootimage`
