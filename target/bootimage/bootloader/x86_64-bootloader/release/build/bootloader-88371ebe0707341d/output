@@ -1,7 +1,0 @@
-cargo:rerun-if-changed=/home/pingvinya/projects/swan_kernel/Cargo.toml
-cargo:rustc-link-search=native=/home/pingvinya/projects/swan_kernel/target/bootimage/bootloader/x86_64-bootloader/release/build/bootloader-88371ebe0707341d/out
-cargo:rustc-link-lib=static=kernel_bin-swan_kernel
-cargo:rerun-if-env-changed=KERNEL
-cargo:rerun-if-env-changed=KERNEL_MANIFEST
-cargo:rerun-if-changed=/home/pingvinya/projects/swan_kernel/target/target/debug/swan_kernel
-cargo:rerun-if-changed=build.rs
