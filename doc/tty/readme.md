@@ -1,3 +1,4 @@
 ```rust 
-fn print(s: &str) -> ()```
+fn print(s: &str) -> ()
+```
 Outputting a string to the screen via VGA
