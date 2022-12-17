@@ -21,6 +21,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6e02311b16c9819e7c72866d379cdd3026c3b7b25c1edf161f548f8e887e7ff"
 
 [[package]]
+name = "bootloader_api"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "babfb07dea4565842980315ad530a023aa348db43d03dfa104a70fdaca97d48e"
+
+[[package]]
 name = "rustversion"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -31,6 +37,7 @@ name = "swan_kernel"
 version = "0.1.0"
 dependencies = [
  "bootloader",
+ "bootloader_api",
  "x86_64",
 ]
 
