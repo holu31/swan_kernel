@@ -12,4 +12,3 @@ for compilation use `cargo bootimage`
 
 Run:
 `cargo run`
-or use grub/limine to compile kernel to iso file
