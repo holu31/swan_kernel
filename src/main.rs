@@ -20,6 +20,7 @@ bootloader_api::entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(bootinfo: &'static mut bootloader_api::BootInfo)-> !{
+    putchar(b's');
     print("Hello world!");
     loop {}
 }
