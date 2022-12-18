@@ -21,7 +21,7 @@ entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    print("Hello world!");
+    puts("Hello world!");
     loop {
         x86_64::instructions::hlt();
     }

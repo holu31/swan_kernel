@@ -1,24 +1,46 @@
-const VGA_BUFFER: *mut u8 = 0xb8000 as *mut u8;
-static mut position: isize = 0;
+const BUF: *mut [[(u8, Color); 80]; 25] = 0xB8000 as *mut _;
 
-pub fn print(s: &str){
-    s.as_bytes()
-        .iter()
-        .flat_map(|bt| [*bt, 0x7 as u8])
-        .enumerate()
-        .for_each(|(i, byte)| unsafe {
-            *VGA_BUFFER.offset(position) = byte;
-            position += 1;
-        });
+#[repr(u8)]
+#[derive(Clone, Copy)]
+pub enum Color {
+    Black,
+    Blue,
+    Green,
+    Cyan,
+    Red,
+    Magenta,
+    Brown,
+    LightGray,
+    DarkGray
 }
 
-pub fn putchar(c: u8){
-    let s: &[u8; 1] = &[c];
-    s.iter()
-    .flat_map(|bt| [*bt, 0x7 as u8])
-    .enumerate()
-    .for_each(|(i, byte)| unsafe {
-        *VGA_BUFFER.offset(position) = byte;
-        position += 1;
-    });
+pub use Color::*;
+
+static mut CURSOR: (usize, usize) = (0, 0);
+
+static mut COLOR: Color = LightGray;
+
+pub fn set_color(color: Color) {
+    unsafe {
+        COLOR = color;
+    }
+}
+
+pub fn putc(c: u8) {
+    unsafe {
+        if c == 0 || CURSOR.1 > 25 {
+            return;
+        } else if c == b'\n' || CURSOR.0 == 80 {
+            CURSOR.0 = 0;
+            CURSOR.1 += 1;
+            return;
+        }
+        (&mut *BUF)[CURSOR.1][CURSOR.0] = (c, COLOR.clone());
+        CURSOR.0 += 1;
+    }
+}
+
+pub fn puts(s: &str) {
+    s.bytes()
+    .for_each(|i| putc(i));
 }
