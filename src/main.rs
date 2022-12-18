@@ -4,6 +4,7 @@
 mod tty;
 
 use core::panic::PanicInfo;
+use bootloader_api::*;
 use crate::tty::*;
 
 #[panic_handler]
@@ -11,16 +12,17 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-const CONFIG: bootloader_api::BootloaderConfig = {
-    let mut config = bootloader_api::BootloaderConfig::new_default();
+const CONFIG: BootloaderConfig = {
+    let mut config = BootloaderConfig::new_default();
     config.kernel_stack_size = 100 * 1024; // 100 KiB
     config
 };
-bootloader_api::entry_point!(kernel_main, config = &CONFIG);
+entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    putchar(b's');
     print("Hello world!");
-    loop {}
+    loop {
+        x86_64::instructions::hlt();
+    }
 }

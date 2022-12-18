@@ -22,4 +22,3 @@ pub fn putchar(c: u8){
         position += 1;
     });
 }
-
