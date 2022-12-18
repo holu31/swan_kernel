@@ -4,7 +4,7 @@
 mod tty;
 
 use core::panic::PanicInfo;
-use crate::tty::print;
+use crate::tty::*;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
