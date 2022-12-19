@@ -1,5 +1,3 @@
-const BUF: *mut [[(u8, Color); 80]; 25] = 0xB8000 as *mut _;
-
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum Color {
@@ -14,33 +12,46 @@ pub enum Color {
     DarkGray
 }
 
-pub use Color::*;
-
-static mut CURSOR: (usize, usize) = (0, 0);
-
-static mut COLOR: Color = LightGray;
-
-pub fn set_color(color: Color) {
-    unsafe {
-        COLOR = color;
-    }
+pub struct Writer {
+    buffer: *mut [[(u8, Color); 80]; 25],
+    pub color: Color,
+    cursor: (usize, usize)
 }
 
-pub fn putc(c: u8) {
-    unsafe {
-        if c == 0 || CURSOR.1 > 25 {
-            return;
-        } else if c == b'\n' || CURSOR.0 == 80 {
-            CURSOR.0 = 0;
-            CURSOR.1 += 1;
-            return;
+impl Writer {
+    pub fn init() -> Self {
+        Self {
+            color: Color::LightGray,
+            cursor: (0, 0),
+            buffer: 0xB8000 as *mut _
         }
-        (&mut *BUF)[CURSOR.1][CURSOR.0] = (c, COLOR.clone());
-        CURSOR.0 += 1;
+    }
+
+    pub fn cursor_xy(&mut self, x: usize, y: usize){
+        self.cursor = (x, y);
+    }
+
+    pub fn cursor_move(&mut self, offset: usize){
+        self.cursor.0 += offset;
+    }
+
+    pub fn write_byte(&mut self, byte: u8){
+        unsafe {
+            if byte == 0 || self.cursor.1 > 25 {
+                return;
+            } else if byte == b'\n' || self.cursor.0 == 80 {
+                self.cursor.0 = 0;
+                self.cursor.1 += 1;
+                return;
+            }
+            (&mut *self.buffer)[self.cursor.1][self.cursor.0] = (byte, self.color.clone());
+            self.cursor_move(1);
+        }
+    }
+
+    pub fn write_string(&mut self, string: &str){
+        string.bytes()
+            .for_each(|i| self.write_byte(i));
     }
 }
 
-pub fn puts(s: &str) {
-    s.bytes()
-    .for_each(|i| putc(i));
-}
