@@ -47,4 +47,20 @@ pub fn write_string(string: &str){
         .for_each(|i| write_byte(i));
 }
 
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::drivers::tty::io::_print(format_args!($($arg)*)));
+}
 
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
+
+use core::fmt;
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    let str = args.as_str().unwrap();
+    write_string(str);
+}
