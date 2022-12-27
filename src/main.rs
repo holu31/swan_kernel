@@ -1,11 +1,12 @@
 #![no_std]
 #![no_main]
+#![feature(once_cell)]
 
-mod tty;
+mod drivers;
 
 use core::panic::PanicInfo;
 use bootloader_api::*;
-use crate::tty::*;
+use drivers::*;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -20,9 +21,8 @@ const CONFIG: BootloaderConfig = {
 entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
-fn kernel_main(bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    let mut writer = tty::Writer::init();
-    writer.write_string("Hello world!");
+fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
+    tty::io::write_string("hello");
     loop {
         x86_64::instructions::hlt();
     }
