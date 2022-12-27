@@ -1,12 +1,14 @@
 #![no_std]
 #![no_main]
-#![feature(once_cell)]
+#![feature(abi_x86_interrupt)]
 
 mod drivers;
+mod arch;
 
 use core::panic::PanicInfo;
 use bootloader_api::*;
 use drivers::*;
+use arch::*;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -22,7 +24,9 @@ entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    tty::io::write_string("hello");
+    x86::idt::init_idt();
+    tty::io::write_string("ypa, npepuBaHue - ");
+    x86_64::instructions::interrupts::int3();
     loop {
         x86_64::instructions::hlt();
     }
