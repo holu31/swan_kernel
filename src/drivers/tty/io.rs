@@ -55,7 +55,10 @@ macro_rules! print {
 #[macro_export]
 macro_rules! println {
     () => ($crate::print!("\n"));
-    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+    ($($arg:tt)*) => (
+        $crate::drivers::tty::io::_print(format_args!($($arg)*));
+        $crate::print!("\n")
+    );
 }
 
 use core::fmt;
