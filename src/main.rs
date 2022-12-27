@@ -12,6 +12,7 @@ use arch::*;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    tty::io::write_string("PANIC!");
     loop {}
 }
 
@@ -25,7 +26,6 @@ entry_point!(kernel_main, config = &CONFIG);
 #[no_mangle]
 fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
     x86::idt::init_idt();
-    println!("Hello!");
     x86_64::instructions::interrupts::int3();
     loop {
         x86_64::instructions::hlt();

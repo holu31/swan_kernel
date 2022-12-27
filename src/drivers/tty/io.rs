@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 #[repr(u8)]
 #[derive(Clone, Copy)]
 pub enum Color {
@@ -9,7 +10,14 @@ pub enum Color {
     Magenta,
     Brown,
     LightGray,
-    DarkGray
+    DarkGray,
+    LightBlue,
+    LightGreen,
+    LightCyan,
+    LightRed,
+    Pink,
+    Yellow,
+    White,
 }
 
 static mut BUFFER: *mut [[(u8, Color); 80]; 25] = 0xB8000 as *mut _;
@@ -45,25 +53,4 @@ pub fn write_byte(byte: u8){
 pub fn write_string(string: &str){
     string.bytes()
         .for_each(|i| write_byte(i));
-}
-
-#[macro_export]
-macro_rules! print {
-    ($($arg:tt)*) => ($crate::drivers::tty::io::_print(format_args!($($arg)*)));
-}
-
-#[macro_export]
-macro_rules! println {
-    () => ($crate::print!("\n"));
-    ($($arg:tt)*) => (
-        $crate::drivers::tty::io::_print(format_args!($($arg)*));
-        $crate::print!("\n")
-    );
-}
-
-use core::fmt;
-#[doc(hidden)]
-pub fn _print(args: fmt::Arguments) {
-    let str = args.as_str().unwrap();
-    write_string(str);
 }
