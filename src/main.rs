@@ -2,17 +2,14 @@
 #![no_main]
 #![feature(abi_x86_interrupt)]
 
-mod drivers;
-mod arch;
-
 use core::panic::PanicInfo;
 use bootloader_api::*;
-use drivers::*;
-use arch::*;
+
+mod vga_buffer;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
-    tty::io::write_string("PANIC!");
+    println!("{}", _info);
     loop {}
 }
 
@@ -25,8 +22,8 @@ entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    x86::idt::init_idt();
-    x86_64::instructions::interrupts::int3();
+    println!("Hello World{} some numbers {}", "!", 32.214214);
+    
     loop {
         x86_64::instructions::hlt();
     }
