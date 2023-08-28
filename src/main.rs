@@ -9,6 +9,8 @@ use core::panic::PanicInfo;
 use bootloader::{entry_point, BootInfo};
 use x86_64::VirtAddr;
 use swan_kernel::memory::{BootInfoFrameAllocator};
+use swan_kernel::task::{Task, executor::Executor};
+use swan_kernel::task::keyboard;
 
 use swan_kernel::*;
 
@@ -41,12 +43,12 @@ fn kernel_main(_boot_info: &'static BootInfo)-> !{
     };
 
     allocator::init_heap(&mut mapper, &mut frame_allocator)
-        .expect("heap initialization failed");
+        .expect("heap initialization [failed]");
 
     #[cfg(test)]
     test_main();
 
-    loop {
-        x86_64::instructions::hlt();
-    }
+    let mut executor = Executor::new();
+    executor.spawn(Task::new(keyboard::print_keypresses()));
+    executor.run();
 }
