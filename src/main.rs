@@ -1,16 +1,26 @@
 #![no_std]
 #![no_main]
 #![feature(abi_x86_interrupt)]
+#![feature(custom_test_frameworks)]
+#![test_runner(swan_kernel::test_runner)]
+#![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
 use bootloader_api::*;
 
-mod vga_buffer;
+use swan_kernel::*;
 
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     println!("{}", _info);
     loop {}
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    swan_kernel::test_panic_handler(info)
 }
 
 const CONFIG: BootloaderConfig = {
@@ -22,8 +32,11 @@ entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    println!("Hello World{} some numbers {}", "!", 32.214214);
-    
+    println!("Hello World! some numbers {}", 32.214214);
+
+    #[cfg(test)]
+    test_main();
+
     loop {
         x86_64::instructions::hlt();
     }

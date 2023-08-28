@@ -5,15 +5,15 @@ edition = "2021"
 
 [package.metadata.bootimage]
 run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
-
-[profile.dev]
-panic = "abort"
-
-[profile.release]
-panic = "abort"
+test-args = [
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+    "-serial", "stdio",
+    "-display", "none"
+    ]
+test-success-exit-code = 33
 
 [dependencies.lazy_static]
-version = "1.0"
+version = "1.4.0"
 features = ["spin_no_std"]
 
 [dependencies]
@@ -22,3 +22,4 @@ volatile = "0.2.6"
 bootloader = "0.9.7"
 bootloader_api = "0.11.0"
 x86_64 = "0.14.10"
+uart_16550= "0.2.0"
