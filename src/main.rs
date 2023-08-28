@@ -6,7 +6,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use bootloader_api::*;
+use bootloader::{entry_point, BootInfo};
 
 use swan_kernel::*;
 
@@ -23,17 +23,12 @@ fn panic(info: &PanicInfo) -> ! {
     swan_kernel::test_panic_handler(info)
 }
 
-const CONFIG: BootloaderConfig = {
-    let mut config = BootloaderConfig::new_default();
-    config.kernel_stack_size = 100 * 1024; // 100 KiB
-    config
-};
-entry_point!(kernel_main, config = &CONFIG);
+entry_point!(kernel_main);
 
 #[no_mangle]
-fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
+fn kernel_main(_boot_info: &'static BootInfo)-> !{
     init();
-
+    
     #[cfg(test)]
     test_main();
 
