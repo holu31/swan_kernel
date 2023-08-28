@@ -11,7 +11,6 @@ use swan_kernel::task::{Task, executor::Executor};
 use swan_kernel::task::keyboard;
 use x86_64::VirtAddr;
 use memory::{BootInfoFrameAllocator};
-use x86_64::structures::paging::Page;
 
 use swan_kernel::*;
 

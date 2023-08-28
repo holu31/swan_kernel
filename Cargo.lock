@@ -27,12 +27,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6e02311b16c9819e7c72866d379cdd3026c3b7b25c1edf161f548f8e887e7ff"
 
 [[package]]
-name = "bootloader_api"
-version = "0.11.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88f843888771a490c3ad246e58bf25e62da70d2c653d74a3eca92acbab599e02"
-
-[[package]]
 name = "cfg-if"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -191,7 +185,6 @@ name = "swan_kernel"
 version = "0.1.0"
 dependencies = [
  "bootloader",
- "bootloader_api",
  "conquer-once",
  "crossbeam-queue",
  "futures-util",
@@ -210,7 +203,6 @@ name = "swan_os"
 version = "0.1.0"
 dependencies = [
  "bootloader",
- "bootloader_api",
  "swan_kernel",
  "x86_64",
 ]
