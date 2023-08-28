@@ -201,17 +201,7 @@ dependencies = [
  "pic8259",
  "spin",
  "uart_16550",
- "volatile 0.2.7",
- "x86_64",
-]
-
-[[package]]
-name = "swan_os"
-version = "0.1.0"
-dependencies = [
- "bootloader",
- "bootloader_api",
- "swan_kernel",
+ "volatile 0.2.6",
  "x86_64",
 ]
 
@@ -228,9 +218,9 @@ dependencies = [
 
 [[package]]
 name = "volatile"
-version = "0.2.7"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6b06ad3ed06fef1713569d547cdbdb439eafed76341820fb0e0344f29a41945"
+checksum = "6af0edf5b4faacc31fc51159244d78d65ec580f021afcef7bd53c04aeabc7f29"
 
 [[package]]
 name = "volatile"

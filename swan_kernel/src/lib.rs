@@ -18,6 +18,10 @@ pub mod memory;
 pub mod allocator;
 pub mod task;
 
+use x86_64::VirtAddr;
+use memory::{BootInfoFrameAllocator};
+use bootloader::BootInfo;
+
 pub trait Testable {
     fn run(&self);
 }
@@ -58,22 +62,31 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     }
 }
 
-pub fn init(){
+pub fn init(_boot_info: &'static BootInfo){
     gdt::init();
     interrupts::init_idt();
     unsafe { interrupts::PICS.lock().initialize() };
     x86_64::instructions::interrupts::enable();
+
+    let phys_mem_offset = VirtAddr::new(_boot_info.physical_memory_offset);
+    let mut mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe {
+        BootInfoFrameAllocator::init(&_boot_info.memory_map)
+    };
+
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+        .expect("heap initialization [failed]");
 }
 
 #[cfg(test)]
-use bootloader::{entry_point, BootInfo};
+use bootloader::entry_point;
 
 #[cfg(test)]
 entry_point!(test_kernel_main);
 
 #[cfg(test)]
 fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
-    init();
+    init(_boot_info);
     test_main();
 
     loop {

@@ -7,12 +7,10 @@
 
 use core::panic::PanicInfo;
 use bootloader::{entry_point, BootInfo};
-use x86_64::VirtAddr;
-use swan_kernel::memory::{BootInfoFrameAllocator};
 use swan_kernel::task::{Task, executor::Executor};
 use swan_kernel::task::keyboard;
 
-use swan_kernel::*;
+use swan_kernel::println;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -34,16 +32,7 @@ extern crate alloc;
 #[no_mangle]
 fn kernel_main(_boot_info: &'static BootInfo)-> !{
 
-    init();
-
-    let phys_mem_offset = VirtAddr::new(_boot_info.physical_memory_offset);
-    let mut mapper = unsafe { memory::init(phys_mem_offset) };
-    let mut frame_allocator = unsafe {
-        BootInfoFrameAllocator::init(&_boot_info.memory_map)
-    };
-
-    allocator::init_heap(&mut mapper, &mut frame_allocator)
-        .expect("heap initialization [failed]");
+    swan_kernel::init(_boot_info);
 
     #[cfg(test)]
     test_main();
