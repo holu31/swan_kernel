@@ -32,7 +32,7 @@ entry_point!(kernel_main, config = &CONFIG);
 
 #[no_mangle]
 fn kernel_main(_bootinfo: &'static mut bootloader_api::BootInfo)-> !{
-    println!("Hello World! some numbers {}", 32.214214);
+    init();
 
     #[cfg(test)]
     test_main();

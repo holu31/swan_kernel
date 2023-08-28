@@ -10,6 +10,8 @@ use core::panic::PanicInfo;
 
 pub mod vga_buffer;
 pub mod serial;
+pub mod interrupts;
+pub mod gdt;
 
 pub trait Testable {
     fn run(&self);
@@ -51,6 +53,13 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     }
 }
 
+pub fn init(){
+    gdt::init();
+    interrupts::init_idt();
+    unsafe { interrupts::PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
+}
+
 #[cfg(test)]
 use bootloader::{entry_point, BootInfo};
 
@@ -60,6 +69,7 @@ entry_point!(test_kernel_main);
 /// Entry point for `cargo xtest`
 #[cfg(test)]
 fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
+    init();
     test_main();
 
     loop {
