@@ -8,11 +8,14 @@
 
 use core::panic::PanicInfo;
 
+extern crate alloc;
+
 pub mod vga_buffer;
 pub mod serial;
 pub mod interrupts;
 pub mod gdt;
 pub mod memory;
+pub mod allocator;
 
 pub trait Testable {
     fn run(&self);
@@ -67,7 +70,6 @@ use bootloader::{entry_point, BootInfo};
 #[cfg(test)]
 entry_point!(test_kernel_main);
 
-/// Entry point for `cargo xtest`
 #[cfg(test)]
 fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
     init();
