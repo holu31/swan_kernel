@@ -6,6 +6,9 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
+use x86_64::VirtAddr;
+use memory::{BootInfoFrameAllocator};
+use swan_kernel::*;
 
 extern crate alloc;
 
@@ -15,9 +18,18 @@ use bootloader::{entry_point, BootInfo};
 
 entry_point!(tmain);
 
-fn tmain(boot_info: &'static BootInfo) -> ! {
+fn tmain(_boot_info: &'static BootInfo) -> ! {
 
-    swan_kernel::init(boot_info);
+    swan_kernel::init();
+
+    let phys_mem_offset = VirtAddr::new(_boot_info.physical_memory_offset);
+    let mut mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe {
+        BootInfoFrameAllocator::init(&_boot_info.memory_map)
+    };
+
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+        .expect("heap initialization [failed]");
 
     test_main();
     
