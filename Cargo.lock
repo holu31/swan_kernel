@@ -203,6 +203,9 @@ name = "swan_os"
 version = "0.1.0"
 dependencies = [
  "bootloader",
+ "futures-util",
+ "lazy_static",
+ "pc-keyboard",
  "swan_kernel",
  "x86_64",
 ]

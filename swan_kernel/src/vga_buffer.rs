@@ -102,6 +102,19 @@ impl Writer {
         }
     }
 
+    pub fn write_custom_byte(&mut self, byte: u8, color: Color) {
+        let row = BUFFER_HEIGHT - 1;
+        let col = self.column_position;
+
+        let color_code = ColorCode::new(color, Color::Black);
+
+        self.buffer.chars[row][col].write(ScreenChar {
+            ascii_character: byte,
+            color_code,
+        });
+        self.column_position += 1;
+    }
+
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {

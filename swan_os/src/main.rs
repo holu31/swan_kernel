@@ -8,11 +8,12 @@
 use core::panic::PanicInfo;
 use bootloader::{entry_point, BootInfo};
 use swan_kernel::task::{Task, executor::Executor};
-use swan_kernel::task::keyboard;
 use x86_64::VirtAddr;
 use memory::{BootInfoFrameAllocator};
 
 use swan_kernel::*;
+
+mod terminal;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -49,6 +50,6 @@ fn kernel_main(_boot_info: &'static BootInfo)-> !{
     test_main();
 
     let mut executor = Executor::new();
-    executor.spawn(Task::new(keyboard::print_keypresses()));
+    executor.spawn(Task::new(terminal::run()));
     executor.run();
 }
