@@ -19,3 +19,4 @@ x86_64 = "0.14.10"
 pc-keyboard = "0.5.0"
 futures-util = { version = "0.3.4", default-features = false, features = ["alloc"] }
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
+hashbrown = "0.14.0"
