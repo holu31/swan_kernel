@@ -4,6 +4,7 @@ use futures_util::stream::StreamExt;
 use alloc::string::String;
 use crate::alloc::string::ToString;
 use alloc::vec::Vec;
+use alloc::format;
 use hashbrown::HashMap;
 use swan_kernel::vga_buffer::*;
 
@@ -61,13 +62,18 @@ impl Command {
         self
     }
 
-    pub fn build(&self, buffer: String, f: fn(HashMap<String, String>)) {
+    pub fn build(
+        &self, 
+        buffer: String,
+    ) -> Result<HashMap<String, String>, String> {
         let mut args = buffer.split_whitespace().collect::<Vec<&str>>();
         let command = args.remove(0).to_string();
 
         if command == self.command {
 
-            assert_eq!(self.args.len(),args.len());
+            if self.args.len() != args.len() {
+                return Err(format!("args != {}", self.args.len()));
+            }
 
             let mut parsed_args = HashMap::new();
 
@@ -78,17 +84,29 @@ impl Command {
                 );
             }
 
-            f(parsed_args);
+            return Ok(parsed_args);
         }
+        Err(format!("not found '{}' command", buffer))
     }
 
 }
 
 fn parse(buffer: String) {
-    Command::new("test")
-        .arg("test_arg")
-        .build(buffer.clone(), |args| println!("{}", args["test_arg"]));
 
-    Command::new("help")
-        .build(buffer.clone(), |args| println!("kek2"));
+    // TODO: Make a search command
+
+    match Command::new("test")
+        .arg("test_arg")
+        .build(buffer.clone()) {
+            
+            Ok(args) => println!("{}", args["test_arg"]),
+            Err(_) => {}
+    };
+
+    match Command::new("help")
+        .build(buffer.clone()) {
+            
+            Ok(_) => println!("help"),
+            Err(_) => {}
+    };
 }
