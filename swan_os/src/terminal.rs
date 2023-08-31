@@ -1,10 +1,12 @@
 use swan_kernel::{task::keyboard, println, print};
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
 use futures_util::stream::StreamExt;
-use alloc::string::String;
-use crate::alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
+use alloc::{
+    string::String,
+    string::ToString,
+    vec::Vec,
+    format
+};
 use hashbrown::HashMap;
 use swan_kernel::vga_buffer::*;
 
