@@ -127,6 +127,22 @@ impl Writer {
         }
     }
 
+    pub fn pop(&mut self, i: usize){
+        let col = self.column_position;
+        let row = BUFFER_HEIGHT - 1;
+
+        if i <= self.column_position
+            && i > 0 {
+                for new_col in col-i..col {
+                    self.buffer.chars[row][new_col].write(ScreenChar {
+                        ascii_character: b'\0',
+                        color_code: self.color_code
+                    });
+                    self.column_position -= 1;
+                }
+        }
+    }
+
     fn new_line(&mut self) {
         for row in 1..BUFFER_HEIGHT {
             for col in 0..BUFFER_WIDTH {

@@ -25,15 +25,24 @@ pub async fn run() {
             if let Some(key) = keyboard.process_keyevent(key_event) {
                 match key {
                     DecodedKey::Unicode(character) => {
-                        print!("{}", character);
                         match character {
-                            '\n' => {
-                                parse(buffer.clone());
-                                buffer.clear();
-
+                            '\n' => { // Enter
+                                print!("{}", character);
+                                if buffer.len() > 0 {
+                                    parse(buffer.clone());
+                                    buffer.clear();
+                                }
+                                
                                 WRITER.lock().write_custom_byte(CONFIG.0, CONFIG.1);
-                            }
+                            },
+                            '\u{8}' => { // Backspace
+                                if buffer.len() > 0 {
+                                    buffer.pop();
+                                    WRITER.lock().pop(1);
+                                }
+                            },
                             _ => {
+                                print!("{}", character);
                                 buffer.push(character);
                             }
                         }
