@@ -8,7 +8,7 @@ use alloc::{
     format
 };
 use hashbrown::HashMap;
-use swan_kernel::vga_buffer::*;
+use swan_kernel::arch::x86_64::vga_buffer::*;
 
 const CONFIG: (u8, Color) = (b'>', Color::Yellow);
 
