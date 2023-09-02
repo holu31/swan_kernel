@@ -13,7 +13,7 @@ use memory::{BootInfoFrameAllocator};
 
 use swan_kernel::*;
 
-mod terminal;
+mod shell;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -50,6 +50,6 @@ fn kernel_main(_boot_info: &'static BootInfo)-> !{
     test_main();
 
     let mut executor = Executor::new();
-    executor.spawn(Task::new(terminal::run()));
+    executor.spawn(Task::new(shell::run()));
     executor.run();
 }

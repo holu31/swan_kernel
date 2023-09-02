@@ -29,7 +29,7 @@ pub async fn run() {
                             '\n' => { // Enter
                                 print!("{}", character);
                                 if buffer.len() > 0 {
-                                    parse(buffer.clone());
+                                    exec(buffer.clone());
                                     buffer.clear();
                                 }
                                 
@@ -82,7 +82,7 @@ impl Command {
 
         if command == self.command {
 
-            if self.args.len() != args.len() {
+            if self.args.len() > args.len() {
                 return Err(format!("args != {}", self.args.len()));
             }
 
@@ -102,7 +102,7 @@ impl Command {
 
 }
 
-fn parse(buffer: String) {
+fn exec(buffer: String) {
 
     // TODO: Make a search command
 
