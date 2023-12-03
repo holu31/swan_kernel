@@ -18,8 +18,7 @@ pub(crate) fn add_scancode(scancode: u8) {
     if let Ok(queue) = SCANCODE_QUEUE.try_get() {
         if let Err(_) = queue.push(scancode) {
             println!("WARNING: scancode queue full; dropping keyboard input");
-        }
-        else {
+        } else {
             WAKER.wake();
         }
     } else {
@@ -33,7 +32,8 @@ pub struct ScancodeStream {
 
 impl ScancodeStream {
     pub fn new() -> Self {
-        SCANCODE_QUEUE.try_init_once(|| ArrayQueue::new(100))
+        SCANCODE_QUEUE
+            .try_init_once(|| ArrayQueue::new(100))
             .expect("ScancodeStream::new should only be called once");
         ScancodeStream { _private: () }
     }
@@ -64,8 +64,7 @@ impl Stream for ScancodeStream {
 
 pub async fn print_keypresses() {
     let mut scancodes = ScancodeStream::new();
-    let mut keyboard = Keyboard::new(layouts::Us104Key, ScancodeSet1,
-        HandleControl::Ignore);
+    let mut keyboard = Keyboard::new(layouts::Us104Key, ScancodeSet1, HandleControl::Ignore);
 
     while let Some(scancode) = scancodes.next().await {
         if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {

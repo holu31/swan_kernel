@@ -1,4 +1,4 @@
-pub mod vga_buffer;
-pub mod interrupts;
-pub mod serial;
 pub mod gdt;
+pub mod interrupts;
+pub mod devices;
+pub mod video;

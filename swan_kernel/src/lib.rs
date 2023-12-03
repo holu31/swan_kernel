@@ -15,7 +15,7 @@ pub mod memory;
 pub mod allocator;
 pub mod task;
 
-use crate::arch::x86_64::*;
+use crate::arch::x86_64::{*, devices::*};
 
 pub trait Testable {
     fn run(&self);
@@ -60,8 +60,7 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 pub fn init(){
     gdt::init();
     interrupts::init_idt();
-    unsafe { interrupts::PICS.lock().initialize() };
-    x86_64::instructions::interrupts::enable();
+    pic::init();
 }
 
 #[cfg(test)]

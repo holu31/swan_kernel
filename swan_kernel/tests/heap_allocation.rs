@@ -7,7 +7,7 @@
 
 use core::panic::PanicInfo;
 use x86_64::VirtAddr;
-use memory::{BootInfoFrameAllocator};
+use memory::BootInfoFrameAllocator;
 use swan_kernel::*;
 
 extern crate alloc;

@@ -13,7 +13,7 @@ use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 pub extern "C" fn _start() -> ! {
     serial_print!("stack_overflow::stack_overflow...\t");
 
-    swan_kernel::gdt::init();
+    crate::arch::x86_64::gdt::init();
     init_test_idt();
     
     stack_overflow();
@@ -33,7 +33,7 @@ lazy_static! {
         unsafe {
             idt.double_fault
                 .set_handler_fn(test_double_fault_handler)
-                .set_stack_index(swan_kernel::gdt::DOUBLE_FAULT_IST_INDEX);
+                .set_stack_index(crate::arch::x86_64::gdt::DOUBLE_FAULT_IST_INDEX);
         }
 
         idt

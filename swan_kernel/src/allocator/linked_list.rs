@@ -47,9 +47,7 @@ impl LinkedListAllocator {
         self.head.next = Some(&mut *node_ptr)
     }
 
-    fn alloc_from_region(region: &ListNode, size: usize, align: usize)
-        -> Result<usize, ()>
-    {
+    fn alloc_from_region(region: &ListNode, size: usize, align: usize) -> Result<usize, ()> {
         let alloc_start = align_up(region.start_addr(), align);
         let alloc_end = alloc_start.checked_add(size).ok_or(())?;
 
@@ -65,9 +63,7 @@ impl LinkedListAllocator {
         Ok(alloc_start)
     }
 
-    fn find_region(&mut self, size: usize, align: usize)
-        -> Option<(&'static mut ListNode, usize)>
-    {
+    fn find_region(&mut self, size: usize, align: usize) -> Option<(&'static mut ListNode, usize)> {
         let mut current = &mut self.head;
 
         while let Some(ref mut region) = current.next {

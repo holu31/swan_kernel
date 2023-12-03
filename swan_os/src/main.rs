@@ -9,11 +9,14 @@ use core::panic::PanicInfo;
 use bootloader::{entry_point, BootInfo};
 use swan_kernel::task::{Task, executor::Executor};
 use x86_64::VirtAddr;
-use memory::{BootInfoFrameAllocator};
+use memory::BootInfoFrameAllocator;
 
 use swan_kernel::*;
+use swan_kernel::arch::x86_64::devices::*;
 
-mod shell;
+mod usr;
+
+use crate::usr::*;
 
 #[cfg(not(test))]
 #[panic_handler]
@@ -36,6 +39,7 @@ extern crate alloc;
 fn kernel_main(_boot_info: &'static BootInfo)-> !{
 
     swan_kernel::init();
+    cpu::write_cpu_info();
 
     let phys_mem_offset = VirtAddr::new(_boot_info.physical_memory_offset);
     let mut mapper = unsafe { memory::init(phys_mem_offset) };
@@ -45,11 +49,11 @@ fn kernel_main(_boot_info: &'static BootInfo)-> !{
 
     allocator::init_heap(&mut mapper, &mut frame_allocator)
         .expect("heap initialization [failed]");
-
+    
     #[cfg(test)]
     test_main();
 
     let mut executor = Executor::new();
-    executor.spawn(Task::new(shell::run()));
+    executor.spawn(Task::new(tty::run()));
     executor.run();
 }

@@ -5,7 +5,7 @@ use core::fmt;
 
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::arch::x86_64::vga_buffer::_print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::arch::x86_64::video::_print_video(format_args!($($arg)*)));
 }
 
 #[macro_export]
@@ -15,7 +15,7 @@ macro_rules! println {
 }
 
 #[doc(hidden)]
-pub fn _print(args: fmt::Arguments) {
+pub fn _print_video(args: fmt::Arguments) {
     use core::fmt::Write;
     use x86_64::instructions::interrupts;
     

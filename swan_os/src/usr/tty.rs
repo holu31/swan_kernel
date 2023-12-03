@@ -8,9 +8,9 @@ use alloc::{
     format
 };
 use hashbrown::HashMap;
-use swan_kernel::arch::x86_64::vga_buffer::*;
+use swan_kernel::arch::x86_64::video::*;
 
-const CONFIG: (u8, Color) = (b'>', Color::Yellow);
+const PROMPT: (u8, Color) = (b'>', Color::Yellow);
 
 pub async fn run() {
     let mut scancodes = keyboard::ScancodeStream::new();
@@ -18,7 +18,7 @@ pub async fn run() {
         HandleControl::Ignore);
     let mut buffer: String = String::new();
  
-    WRITER.lock().write_custom_byte(CONFIG.0, CONFIG.1);
+    WRITER.lock().write_custom_byte(PROMPT.0, PROMPT.1);
 
     while let Some(scancode) = scancodes.next().await {
         if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {
@@ -33,7 +33,7 @@ pub async fn run() {
                                     buffer.clear();
                                 }
                                 
-                                WRITER.lock().write_custom_byte(CONFIG.0, CONFIG.1);
+                                WRITER.lock().write_custom_byte(PROMPT.0, PROMPT.1);
                             },
                             '\u{8}' => { // Backspace
                                 if buffer.len() > 0 {
@@ -54,6 +54,8 @@ pub async fn run() {
     }
 }
 
+// TEMP SOLUTIOn
+// TODO ALL COMMANDS OPEN AS PROGRAMS
 pub struct Command {
     command: String,
     args: Vec<String>
@@ -83,7 +85,7 @@ impl Command {
         if command == self.command {
 
             if self.args.len() > args.len() {
-                return Err(format!("args != {}", self.args.len()));
+                return Err(format!("error, args != {}", self.args.len()));
             }
 
             let mut parsed_args = HashMap::new();
@@ -104,8 +106,6 @@ impl Command {
 
 fn exec(buffer: String) {
 
-    // TODO: Make a search command
-
     match Command::new("test")
         .arg("test_arg")
         .build(buffer.clone()) {
@@ -120,4 +120,5 @@ fn exec(buffer: String) {
             Ok(_) => println!("help"),
             Err(_) => {}
     };
+
 }

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [package.metadata.bootimage]
-run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}", "-m", "128M"]
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
     "-serial", "stdio",
@@ -15,8 +15,10 @@ test-success-exit-code = 33
 [dependencies]
 swan_kernel = {path = "../swan_kernel", version = "0.1.0", default-features = false}
 bootloader = { version = "0.9.22", features = ["map_physical_memory"]}
-x86_64 = "0.14.10"
 pc-keyboard = "0.5.0"
 futures-util = { version = "0.3.4", default-features = false, features = ["alloc"] }
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 hashbrown = "0.14.0"
+
+[target.'cfg(any(target_arch = "x86_64"))'.dependencies]
+x86_64 = "0.14.10"
