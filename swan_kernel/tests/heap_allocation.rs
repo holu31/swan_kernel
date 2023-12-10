@@ -6,31 +6,19 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use x86_64::VirtAddr;
-use memory::BootInfoFrameAllocator;
-use swan_kernel::*;
 
 extern crate alloc;
 
 use alloc::{boxed::Box, vec::Vec};
-use swan_kernel::allocator::HEAP_SIZE;
 use bootloader::{entry_point, BootInfo};
+use swan_kernel::{println, allocator};
 
 entry_point!(tmain);
 
 fn tmain(_boot_info: &'static BootInfo) -> ! {
 
-    swan_kernel::init();
-
-    let phys_mem_offset = VirtAddr::new(_boot_info.physical_memory_offset);
-    let mut mapper = unsafe { memory::init(phys_mem_offset) };
-    let mut frame_allocator = unsafe {
-        BootInfoFrameAllocator::init(&_boot_info.memory_map)
-    };
-
-    allocator::init_heap(&mut mapper, &mut frame_allocator)
-        .expect("heap initialization [failed]");
-
+    swan_kernel::init(_boot_info);
+    
     test_main();
     
     loop {}
@@ -56,7 +44,7 @@ fn large_vec() {
 
 #[test_case]
 fn many_boxes() {
-    for i in 0..HEAP_SIZE {
+    for i in 0..1000 {
         let x = Box::new(i);
         assert_eq!(*x, i);
     }
@@ -65,7 +53,7 @@ fn many_boxes() {
 #[test_case]
 fn many_boxes_long_lived() {
     let long_lived = Box::new(1); // new
-    for i in 0..HEAP_SIZE {
+    for i in 0..1000 {
         let x = Box::new(i);
         assert_eq!(*x, i);
     }

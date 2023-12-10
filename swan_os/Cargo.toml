@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [package.metadata.bootimage]
-run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}", "-m", "128M"]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}", "-m", "128M", "-serial", "file:Qemu.log"]
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
     "-serial", "stdio",

@@ -14,8 +14,11 @@ pub mod arch;
 pub mod memory;
 pub mod allocator;
 pub mod task;
+pub mod drivers;
+pub mod log;
 
 use crate::arch::x86_64::{*, devices::*};
+use bootloader::BootInfo;
 
 pub trait Testable {
     fn run(&self);
@@ -57,21 +60,23 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
     }
 }
 
-pub fn init(){
+pub fn init(_boot_info: &'static BootInfo){
     gdt::init();
     interrupts::init_idt();
     pic::init();
+
+    memory::init(_boot_info);
 }
 
 #[cfg(test)]
-use bootloader::{entry_point, BootInfo};
+use bootloader::entry_point;
 
 #[cfg(test)]
 entry_point!(test_kernel_main);
 
 #[cfg(test)]
 fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
-    init();
+    init(_boot_info);
     test_main();
 
     loop {

@@ -1,6 +1,8 @@
 use pic8259::ChainedPics;
 use spin::Mutex;
 
+use crate::ok;
+
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
@@ -12,4 +14,5 @@ pub fn init() {
         PICS.lock().initialize();
     }
     x86_64::instructions::interrupts::enable();
+    ok!("PIC Initialization successful");
 }

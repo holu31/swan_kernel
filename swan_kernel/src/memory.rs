@@ -1,27 +1,76 @@
 use x86_64::{
     VirtAddr, PhysAddr,
     structures::paging::{Page, PhysFrame, Mapper, Size4KiB,
-        FrameAllocator,PageTable, OffsetPageTable}
+        FrameAllocator,PageTable, OffsetPageTable, Translate}, registers::control::Cr3
 };
-use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
+use bootloader::bootinfo::{BootInfo, MemoryMap, MemoryRegionType};
+use core::sync::atomic::{AtomicU64, Ordering};
+use x86_64::instructions::interrupts;
+use crate::{info, allocator, ok};
 
-pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
-    let level_4_table = active_level_4_table(physical_memory_offset);
-    OffsetPageTable::new(level_4_table, physical_memory_offset)
+pub static mut PHYS_MEM_OFFSET: Option<u64> = None;
+pub static mut MEMORY_MAP: Option<&MemoryMap> = None;
+pub static mut MAPPER: Option<OffsetPageTable<'static>> = None;
+
+pub static MEMORY_SIZE: AtomicU64 = AtomicU64::new(0);
+
+pub fn init(boot_info: &'static BootInfo) {
+    interrupts::without_interrupts(|| {
+        let mut memory_size = 0;
+        for region in boot_info.memory_map.iter() {
+            let start_addr = region.range.start_addr();
+            let end_addr = region.range.end_addr();
+            memory_size += end_addr - start_addr;
+            info!("MEM [{:#016X}-{:#016X}] {:?}", start_addr, end_addr - 1, region.region_type);
+        }
+        info!("MEMORY {} KB", memory_size >> 10);
+        MEMORY_SIZE.store(memory_size, Ordering::Relaxed);
+
+        let phys_mem_offset = boot_info.physical_memory_offset;
+
+        unsafe { PHYS_MEM_OFFSET.replace(phys_mem_offset) };
+        unsafe { MEMORY_MAP.replace(&boot_info.memory_map) };
+        unsafe { MAPPER.replace(OffsetPageTable::new(active_page_table(), VirtAddr::new(phys_mem_offset))) };
+
+        ok!("Memory manager initialization sucessful");
+        allocator::init_heap().expect("heap initialization failed.");
+    });
 }
 
-unsafe fn active_level_4_table(physical_memory_offset: VirtAddr)
-    -> &'static mut PageTable
-{
-    use x86_64::registers::control::Cr3;
+pub fn mapper() -> &'static mut OffsetPageTable<'static> {
+    unsafe { MAPPER.as_mut().unwrap() }
+}
 
-    let (level_4_table_frame, _) = Cr3::read();
+pub fn frame_allocator() -> BootInfoFrameAllocator {
+    unsafe { BootInfoFrameAllocator::init(MEMORY_MAP.unwrap()) }
+}
 
-    let phys = level_4_table_frame.start_address();
-    let virt = physical_memory_offset + phys.as_u64();
-    let page_table_ptr: *mut PageTable = virt.as_mut_ptr();
+pub fn memory_size() -> u64 {
+    MEMORY_SIZE.load(Ordering::Relaxed)
+}
 
-    &mut *page_table_ptr
+pub fn phys_to_virt(addr: PhysAddr) -> VirtAddr {
+    let phys_mem_offset = unsafe { PHYS_MEM_OFFSET.unwrap() };
+    VirtAddr::new(addr.as_u64() + phys_mem_offset)
+}
+
+pub fn virt_to_phys(addr: VirtAddr) -> Option<PhysAddr> {
+    mapper().translate_addr(addr)
+}
+
+pub unsafe fn active_page_table() -> &'static mut PageTable {
+    let (frame, _) = Cr3::read();
+    let phys_addr = frame.start_address();
+    let virt_addr = phys_to_virt(phys_addr);
+    let page_table_ptr: *mut PageTable = virt_addr.as_mut_ptr();
+    &mut *page_table_ptr // unsafe
+}
+
+pub unsafe fn create_page_table(frame: PhysFrame) -> &'static mut PageTable {
+    let phys_addr = frame.start_address();
+    let virt_addr = phys_to_virt(phys_addr);
+    let page_table_ptr: *mut PageTable = virt_addr.as_mut_ptr();
+    &mut *page_table_ptr // unsafe
 }
 
 pub struct BootInfoFrameAllocator {
@@ -82,7 +131,6 @@ fn translate_addr_inner(addr: VirtAddr, physical_memory_offset: VirtAddr)
     -> Option<PhysAddr>
 {
     use x86_64::structures::paging::page_table::FrameError;
-    use x86_64::registers::control::Cr3;
 
     let (level_4_table_frame, _) = Cr3::read();
 
